@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
 const FIELD_WIDTH = 100;
-const FIELD_LENGTH = 50;
+const FIELD_LENGTH = 70;
 const ROTATION_STEP = 5;
 const DEFAULT_FRAME_DURATION_MS = 900;
 const SAVED_PLAYS_KEY = "oztag-playmaker-saved-plays";
@@ -54,33 +54,32 @@ type SavedPlay = {
   savedAt: string;
 };
 
-const initialBall: Ball = { x: 31, y: 53 };
+const initialBall: Ball = { x: 45, y: 53 };
 
 const initialPlayers: Player[] = [
   // Defence line
-  { id: "defence-MW", role: "MW", team: "defence", x: 14, y: 10, rotation: 180 },
-  { id: "defence-FL", role: "FL", team: "defence", x: 14, y: 22, rotation: 180 },
-  { id: "defence-MR", role: "MR", team: "defence", x: 14, y: 34, rotation: 180 },
-  { id: "defence-FM", role: "FM", team: "defence", x: 14, y: 47, rotation: 180 },
-  { id: "defence-FR", role: "FR", team: "defence", x: 14, y: 65, rotation: 180 },
-  { id: "defence-ML", role: "ML", team: "defence", x: 14, y: 78, rotation: 180 },
-  { id: "defence-FW", role: "FW", team: "defence", x: 14, y: 90, rotation: 180 },
+  { id: "defence-MW", role: "MW", team: "defence", x: 12, y: 10, rotation: 180 },
+  { id: "defence-FL", role: "FL", team: "defence", x: 12, y: 22, rotation: 180 },
+  { id: "defence-MR", role: "MR", team: "defence", x: 12, y: 34, rotation: 180 },
+  { id: "defence-FM", role: "FM", team: "defence", x: 12, y: 47, rotation: 180 },
+  { id: "defence-FR", role: "FR", team: "defence", x: 12, y: 65, rotation: 180 },
+  { id: "defence-ML", role: "ML", team: "defence", x: 12, y: 78, rotation: 180 },
+  { id: "defence-FW", role: "FW", team: "defence", x: 12, y: 90, rotation: 180 },
 
   // Defender who made the tag
-  { id: "defence-MM", role: "MM", team: "defence", x: 23, y: 50, rotation: 180 },
-
-  // Attack line
-  { id: "attack-FW", role: "FW", team: "attack", x: 38, y: 10, rotation: 0 },
-  { id: "attack-ML", role: "ML", team: "attack", x: 38, y: 22, rotation: 0 },
-  { id: "attack-FR", role: "FR", team: "attack", x: 38, y: 34, rotation: 0 },
+  { id: "defence-MM", role: "MM", team: "defence", x: 32, y: 50, rotation: 180 },
 
   // Ruck players
-  { id: "attack-MM", role: "MM", team: "attack", x: 27, y: 50, rotation: 0 },
-  { id: "attack-FM", role: "FM", team: "attack", x: 31, y: 50, rotation: 0 },
+  { id: "attack-MM", role: "MM", team: "attack", x: 38, y: 50, rotation: 0 },
+  { id: "attack-FM", role: "FM", team: "attack", x: 43, y: 50, rotation: 0 },
 
-  { id: "attack-MR", role: "MR", team: "attack", x: 38, y: 65, rotation: 0 },
-  { id: "attack-FL", role: "FL", team: "attack", x: 38, y: 78, rotation: 0 },
-  { id: "attack-MW", role: "MW", team: "attack", x: 38, y: 90, rotation: 0 },
+  // Attack line
+  { id: "attack-FW", role: "FW", team: "attack", x: 60, y: 10, rotation: 0 },
+  { id: "attack-ML", role: "ML", team: "attack", x: 60, y: 22, rotation: 0 },
+  { id: "attack-FR", role: "FR", team: "attack", x: 60, y: 34, rotation: 0 },
+  { id: "attack-MR", role: "MR", team: "attack", x: 60, y: 65, rotation: 0 },
+  { id: "attack-FL", role: "FL", team: "attack", x: 60, y: 78, rotation: 0 },
+  { id: "attack-MW", role: "MW", team: "attack", x: 60, y: 90, rotation: 0 },
 ];
 
 function clonePlayers(players: Player[]) {
@@ -1005,7 +1004,59 @@ function App() {
           </p>
 
           <div className="pitch" ref={pitchRef} onMouseDown={handlePitchMouseDown}>
+            <div className="try-line gb-try-line" />
+            <div className="ten-line ten-line-top" />
             <div className="halfway-line" />
+            <div className="ten-line ten-line-bottom" />
+            <div className="try-line oppo-try-line" />
+
+            <div className="field-label gb-label">Try line</div>
+            <div className="field-label oppo-label">Try line</div>
+
+            <div className="field-marker marker-top-left">
+              Try line
+              <br />0
+            </div>
+            <div className="field-marker marker-top-right">
+              Try line
+              <br />0
+            </div>
+
+            <div className="field-marker marker-ten-top-left">
+              5010
+              <br />10
+            </div>
+            <div className="field-marker marker-ten-top-right">
+              5010
+              <br />10
+            </div>
+
+            <div className="field-marker marker-half-left">
+              Half way
+              <br />35
+            </div>
+            <div className="field-marker marker-half-right">
+              Half way
+              <br />35
+            </div>
+
+            <div className="field-marker marker-ten-bottom-left">
+              5010
+              <br />60
+            </div>
+            <div className="field-marker marker-ten-bottom-right">
+              5010
+              <br />60
+            </div>
+
+            <div className="field-marker marker-bottom-left">
+              Try line
+              <br />70
+            </div>
+            <div className="field-marker marker-bottom-right">
+              Try line
+              <br />70
+            </div>
 
             {currentFrame?.note && (
               <div className="coach-note-overlay">{currentFrame.note}</div>
