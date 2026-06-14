@@ -1,0 +1,302 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #121212;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.app {
+  padding: 20px;
+  min-height: 100vh;
+}
+
+h1 {
+  text-align: center;
+  margin: 0 0 18px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.sidebar {
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.main-board {
+  min-width: 0;
+}
+
+.control-section {
+  width: 100%;
+  margin: 0 0 14px;
+  padding: 14px;
+  border: 1px solid #ffffff22;
+  border-radius: 14px;
+  background: #181818;
+}
+
+.section-header {
+  margin-bottom: 12px;
+}
+
+.section-header h2 {
+  margin: 0 0 4px;
+  font-size: 17px;
+}
+
+.section-header p {
+  margin: 0;
+  color: #cccccc;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.control-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.button-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.frame-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+button,
+select,
+input,
+textarea {
+  font-family: Arial, sans-serif;
+}
+
+.control-stack button,
+.control-stack select,
+.control-stack input,
+.button-row button,
+.frame-list button {
+  width: 100%;
+  border: 1px solid #ffffff55;
+  background: #222;
+  color: white;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.control-stack input,
+.control-stack select {
+  font-weight: bold;
+}
+
+button:disabled,
+select:disabled,
+input:disabled,
+textarea:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button.active {
+  background: #0367fc;
+  border-color: #0367fc;
+}
+
+.frame-list button.active-frame {
+  background: #d2f801;
+  color: black;
+  border-color: #d2f801;
+}
+
+.frame-note textarea {
+  width: 100%;
+  min-height: 86px;
+  resize: vertical;
+  border-radius: 10px;
+  border: 1px solid #ffffff55;
+  background: #1f1f1f;
+  color: white;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.hint {
+  text-align: center;
+  color: #cccccc;
+  margin: 0 0 14px;
+  font-size: 14px;
+}
+
+.pitch {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  aspect-ratio: 100 / 50;
+  margin: auto;
+  background: #1d8f3a;
+  border: 4px solid white;
+  overflow: hidden;
+}
+
+.halfway-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: white;
+}
+
+.coach-note-overlay {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.72);
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  text-align: center;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.lines-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.tactics-line {
+  fill: none;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tactics-line.run.attack {
+  stroke: #ffffff;
+}
+
+.tactics-line.run.defence {
+  stroke: #111111;
+}
+
+.tactics-line.pass {
+  stroke: #ffe066;
+  stroke-dasharray: 3 3;
+}
+
+.player {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  z-index: 3;
+}
+
+.facing-marker {
+  position: absolute;
+  top: -8px;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 10px solid white;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7));
+}
+
+.player-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.attack {
+  background: #0367fc;
+  color: white;
+}
+
+.defence {
+  background: #d2f801;
+  color: black;
+}
+
+.player.selected,
+.ball.selected {
+  outline: 3px solid white;
+  box-shadow: 0 0 0 4px black;
+}
+
+.ball {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #7a3f1d;
+  border: 2px solid #f4d6a0;
+  color: #f4d6a0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  z-index: 4;
+}
+
+.selection-box {
+  position: absolute;
+  border: 2px dashed white;
+  background: rgba(255, 255, 255, 0.18);
+  z-index: 2;
+  pointer-events: none;
+}
+
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
