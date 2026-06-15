@@ -92,7 +92,9 @@ textarea {
 .control-stack select,
 .control-stack input,
 .button-row button,
-.frame-list button {
+.frame-list button,
+.playbook-item > button,
+.playbook-actions button {
   width: 100%;
   border: 1px solid #ffffff55;
   background: #222;
@@ -408,6 +410,66 @@ button.active {
   background: rgba(255, 255, 255, 0.18);
   z-index: 2;
   pointer-events: none;
+}
+
+/* Playbook */
+
+.playbook {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.playbook-category {
+  border: 1px solid #ffffff22;
+  border-radius: 10px;
+  padding: 10px;
+  background: #151515;
+}
+
+.playbook-category h4 {
+  margin: 0 0 8px;
+  color: #d2f801;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.playbook-item {
+  border: 1px solid #ffffff22;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  background: #202020;
+}
+
+.playbook-item:last-child {
+  margin-bottom: 0;
+}
+
+.playbook-item > button {
+  text-align: left;
+  margin-bottom: 6px;
+}
+
+.selected-play {
+  border-color: #0367fc;
+  box-shadow: 0 0 0 1px #0367fc;
+}
+
+.playbook-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.playbook-actions button {
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
+.playbook-empty {
+  color: #888;
+  font-size: 13px;
 }
 
 @media (max-width: 1000px) {

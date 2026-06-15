@@ -47,9 +47,16 @@ type Frame = {
   lines: TacticsLine[];
 };
 
+type PlayCategory =
+  | "Attack"
+  | "Defence"
+  | "Exiting"
+  | "Other";
+
 type SavedPlay = {
   id: string;
   name: string;
+  category: PlayCategory;
   frames: Frame[];
   savedAt: string;
 };
@@ -157,8 +164,11 @@ function App() {
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
   const [playName, setPlayName] = useState("Untitled Play");
+  const [playCategory, setPlayCategory] =
+  useState<PlayCategory>("Attack");
   const [savedPlays, setSavedPlays] = useState<SavedPlay[]>([]);
   const [selectedSavedPlayId, setSelectedSavedPlayId] = useState("");
+  const [playSearch, setPlaySearch] = useState("");
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isBallSelected, setIsBallSelected] = useState(false);
@@ -261,6 +271,7 @@ function App() {
     const savedPlay: SavedPlay = {
       id: existing?.id ?? crypto.randomUUID(),
       name: cleanName,
+      category: playCategory,
       frames: cloneFrames(framesSnapshot),
       savedAt: new Date().toISOString(),
     };
@@ -283,6 +294,7 @@ function App() {
     const firstFrame = nextFrames[0];
 
     setPlayName(play.name);
+    setPlayCategory(play.category ?? "Other");
     setFrames(nextFrames);
     setCurrentFrameIndex(0);
     setPlayers(clonePlayers(firstFrame.players));
@@ -304,12 +316,49 @@ function App() {
     setSelectedSavedPlayId("");
   }
 
+  function duplicateSavedPlay(playId: string) {
+    const play = savedPlays.find((item) => item.id === playId);
+    if (!play) return;
+
+    const duplicatedPlay: SavedPlay = {
+      ...play,
+      id: crypto.randomUUID(),
+      name: `${play.name} Copy`,
+      frames: cloneFrames(play.frames),
+      savedAt: new Date().toISOString(),
+    };
+
+    persistSavedPlays([...savedPlays, duplicatedPlay]);
+    setSelectedSavedPlayId(duplicatedPlay.id);
+  }
+
+  function renameSavedPlay(playId: string) {
+    const play = savedPlays.find((item) => item.id === playId);
+    if (!play) return;
+
+    const nextName = window.prompt("Rename play", play.name);
+    if (!nextName || !nextName.trim()) return;
+
+    const cleanName = nextName.trim();
+
+    const nextSavedPlays = savedPlays.map((item) =>
+      item.id === playId ? { ...item, name: cleanName } : item
+    );
+
+    persistSavedPlays(nextSavedPlays);
+
+    if (selectedSavedPlayId === playId) {
+      setPlayName(cleanName);
+    }
+  }
+
   function exportCurrentPlay() {
     const cleanName = playName.trim() || "Untitled Play";
 
     const exportData: SavedPlay = {
-      id: crypto.randomUUID(),
+       id: crypto.randomUUID(),
       name: cleanName,
+      category: playCategory,
       frames: cloneFrames(getCurrentFramesSnapshot()),
       savedAt: new Date().toISOString(),
     };
@@ -346,6 +395,7 @@ function App() {
         const nextPlay: SavedPlay = {
           id: crypto.randomUUID(),
           name: importedPlay.name,
+          category: playCategory,
           frames: cloneFrames(importedPlay.frames),
           savedAt: new Date().toISOString(),
         };
@@ -370,6 +420,7 @@ function App() {
     const firstFrame = nextFrames[0];
 
     setPlayName(play.name);
+    setPlayCategory(play.category ?? "Other");
     setFrames(nextFrames);
     setCurrentFrameIndex(0);
     setPlayers(clonePlayers(firstFrame.players));
@@ -783,6 +834,25 @@ function App() {
   const allLines = activeLine ? [...lines, activeLine] : lines;
   const currentFrame = frames[currentFrameIndex];
 
+  const filteredSavedPlays = savedPlays.filter((play) =>
+    play.name.toLowerCase().includes(playSearch.toLowerCase())
+  );
+
+  const playsByCategory: Record<PlayCategory, SavedPlay[]> = {
+    Attack: filteredSavedPlays.filter(
+      (play) => (play.category ?? "Other") === "Attack"
+    ),
+    Defence: filteredSavedPlays.filter(
+      (play) => (play.category ?? "Other") === "Defence"
+    ),
+    Exiting: filteredSavedPlays.filter(
+      (play) => (play.category ?? "Other") === "Exiting"
+    ),
+    Other: filteredSavedPlays.filter(
+      (play) => (play.category ?? "Other") === "Other"
+    ),
+  };
+
   return (
     <div
       className="app"
@@ -939,8 +1009,8 @@ function App() {
 
           <section className="control-section">
             <div className="section-header">
-              <h2>Save & Share</h2>
-              <p>Save plays in this browser or export/import JSON files.</p>
+              <h2>My Playbook</h2>
+              <p>Organise your attacking, defensive and exiting plays.</p>
             </div>
 
             <div className="control-stack">
@@ -950,23 +1020,77 @@ function App() {
                 onChange={(event) => setPlayName(event.target.value)}
                 placeholder="Play name"
               />
+              <select
+                value={playCategory}
+                disabled={isPlaying}
+                onChange={(e) =>
+                  setPlayCategory(e.target.value as PlayCategory)
+                }
+              >
+                <option value="Attack">Attack</option>
+                <option value="Defence">Defence</option>
+                <option value="Exiting">Exiting</option>
+                <option value="Other">Other</option>
+              </select>
 
               <button disabled={isPlaying} onClick={savePlayToBrowser}>
                 Save Play
               </button>
 
-              <select
-                value={selectedSavedPlayId}
+              <input
+                value={playSearch}
                 disabled={isPlaying}
-                onChange={(event) => loadSavedPlay(event.target.value)}
-              >
-                <option value="">Load saved play...</option>
-                {savedPlays.map((play) => (
-                  <option key={play.id} value={play.id}>
-                    {play.name}
-                  </option>
-                ))}
-              </select>
+                onChange={(event) => setPlaySearch(event.target.value)}
+                placeholder="Search playbook..."
+              />
+
+              <div className="playbook">
+                {(["Attack", "Defence", "Exiting", "Other"] as PlayCategory[]).map(
+                  (category) => (
+                    <div key={category} className="playbook-category">
+                      <h4>{category}</h4>
+
+                      {playsByCategory[category].length === 0 ? (
+                        <div className="playbook-empty">No plays</div>
+                      ) : (
+                        playsByCategory[category].map((play) => (
+                          <div
+                            key={play.id}
+                            className={
+                              selectedSavedPlayId === play.id
+                                ? "playbook-item selected-play"
+                                : "playbook-item"
+                            }
+                          >
+                            <button
+                              disabled={isPlaying}
+                              onClick={() => loadSavedPlay(play.id)}
+                            >
+                              {play.name}
+                            </button>
+
+                            <div className="playbook-actions">
+                              <button
+                                disabled={isPlaying}
+                                onClick={() => renameSavedPlay(play.id)}
+                              >
+                                Rename
+                              </button>
+
+                              <button
+                                disabled={isPlaying}
+                                onClick={() => duplicateSavedPlay(play.id)}
+                              >
+                                Duplicate
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )
+                )}
+              </div>
 
               <button disabled={isPlaying || !selectedSavedPlayId} onClick={deleteSavedPlay}>
                 Delete Saved Play
